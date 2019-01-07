@@ -1,61 +1,72 @@
 /* Refer to https://github.com/OleksiyRudenko/a-tiny-JS-world for the task details
    Complete the below for code reviewers' convenience:
 
-   Code repository: _put repo URL here_
-   Web app: _put project's github pages URL here_
+   Code repository: https://github.com/vv2529/a-tiny-JS-world
+   Web app: https://vv2529.github.io/a-tiny-JS-world
    */
 
-// ======== OBJECTS DEFINITIONS ========
-// Define your objects here
-const dog = {
-	type: 'dog',
-	name: 'Bobik',
-	gender: 'male',
-	legs: 4,
-	hands: 0,
-	says: 'Woof!'
-},
-cat = new Proxy({
-	type: 'cat',
-	name: 'Cutie',
-	gender: 'female',
-	legs: 4,
-	hands: 0,
-	says: 'Meow!'
-}, {
-	set: function(obj, prop, value){
-		// When cat.says updates, catWoman.says also updates
-		if(prop == 'says') catWoman.says = value;
-		// Simulate default behavior
-		obj[prop] = value;
+// ======== CLASS DEFINITIONS ========
+class Inhabitant {
+	constructor(type, name, gender, legs, hands, says){
+		this.type = type;
+		this.name = name;
+		this.gender = gender;
+		this.legs = legs;
+		this.hands = hands;
+		this.says = says;
 	}
-}),
-woman = {
-	type: 'human',
-	name: 'Kate',
-	gender: 'female',
-	legs: 2,
-	hands: 2,
-	says: 'What a beautiful day!'
-},
-man = {
-	type: 'human',
-	name: 'Eric',
-	gender: 'male',
-	legs: 2,
-	hands: 2,
-	says: 'Lets go!'
-},
-catWoman = {
-	type: 'half-cat/half-human',
-	name: 'Felicia',
-	gender: 'female',
-	legs: 2,
-	hands: 2,
-	says: cat.says
-};
+	toString(){
+		const props = ['type', 'name', 'gender', 'legs', 'hands', 'says'].map(prop => this[prop]);
+		props.push(this.friends.map(item => item.name).join(', '));
+		return props.join('; ');
+	}
+}
 
-// Cant set friends during initialization
+class Pet extends Inhabitant {
+	constructor(type, name, gender, says){
+		super(type, name, gender, 4, 0, says);
+	}
+}
+class Dog extends Pet {
+	constructor(name, gender){
+		super('dog', name, gender, 'Woof!');
+	}
+}
+class Cat extends Pet {
+	constructor(name, gender){
+		super('cat', name, gender, 'Meow!');
+	}
+}
+
+class Human extends Inhabitant {
+	constructor(name, gender, says){
+		super('human', name, gender, 2, 2, says);
+	}
+}
+
+class CatHuman extends Human {
+	constructor(attachedTo, name, gender){
+		super(name, gender, attachedTo.says);
+		this.attachedTo = attachedTo;
+	}
+	get type(){
+		return 'half-cat/half-human';
+	}
+	set type(value){}
+
+	get says(){
+		return this.attachedTo.says;
+	}
+	set says(value){}
+}
+
+// ======== OBJECT DEFINITIONS ========
+const dog = new Dog('Bobik', 'male'),
+cat = new Cat('Matilda', 'female'),
+woman = new Human('Kate', 'female', 'What a beautiful day!'),
+man = new Human('Eric', 'male', 'Lets go!'),
+catWoman = new CatHuman(cat, 'Felicia', 'female');
+
 dog.friends = [cat, woman, man];
 cat.friends = [woman, catWoman];
 woman.friends = [cat, man];
@@ -64,30 +75,5 @@ catWoman.friends = [cat];
 
 // ======== OUTPUT ========
 [dog, cat, woman, man, catWoman].forEach(entity => {
-	const props = [];
-	['type', 'name', 'gender', 'legs', 'hands', 'says'].forEach(prop => {
-		props.push(entity[prop]);
-	});
-	props.push(entity.friends.map(item => item.name).join(', '));
-	print(props.join('; '));
+	print(entity.toString());
 });
-
-/* Use print(message) for output.
-   Default tag for message is <pre>. Use print(message,'div') to change containing element tag.
-
-   Message can contain HTML markup. You may also tweak index.html and/or styles.css.
-   However, please, REFRAIN from improving visuals at least until your code is reviewed
-   so code reviewers might focus on a single file that is index.js.
-   */
-
-/* Print examples:
-   print('ABC');
-   print('<strong>ABC</strong>');
-   print('<strong>ABC</strong>', 'div');
-
-   print('human; John; male; 2; 2; Hello world!; Rex, Tom, Jenny');
-   print('human; <strong>John</strong>; male; 2; 2; <em>Hello world!</em>; Rex, Tom, Jenny');
-   print('human; <strong>John</strong>; male; 2; 2; <em>Hello world!</em>; Rex, Tom, Jenny', 'div');
-   */
-
-
