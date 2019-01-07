@@ -5,56 +5,63 @@
    Web app: https://vv2529.github.io/a-tiny-JS-world
    */
 
-// ======== OBJECTS DEFINITIONS ========
-const dog = {
-	type: 'dog',
-	name: 'Bobik',
-	gender: 'male',
-	legs: 4,
-	hands: 0,
-	says: 'Woof!'
-},
-cat = new Proxy({
-	type: 'cat',
-	name: 'Cutie',
-	gender: 'female',
-	legs: 4,
-	hands: 0,
-	says: 'Meow!'
-}, {
-	set: function(obj, prop, value){
-		// When cat.says updates, catWoman.says also updates
-		if(prop == 'says') catWoman.says = value;
-		// Simulate default behavior
-		obj[prop] = value;
+// ======== CLASS DEFINITIONS ========
+class Inhabitant {
+	constructor(type, name, gender, legs, hands, says){
+		this.type = type;
+		this.name = name;
+		this.gender = gender;
+		this.legs = legs;
+		this.hands = hands;
+		this.says = says;
 	}
-}),
-woman = {
-	type: 'human',
-	name: 'Kate',
-	gender: 'female',
-	legs: 2,
-	hands: 2,
-	says: 'What a beautiful day!'
-},
-man = {
-	type: 'human',
-	name: 'Eric',
-	gender: 'male',
-	legs: 2,
-	hands: 2,
-	says: 'Lets go!'
-},
-catWoman = {
-	type: 'half-cat/half-human',
-	name: 'Felicia',
-	gender: 'female',
-	legs: 2,
-	hands: 2,
-	says: cat.says
-};
+}
 
-// Cant set friends during initialization
+class Pet extends Inhabitant {
+	constructor(type, name, gender, says){
+		super(type, name, gender, 4, 0, says);
+	}
+}
+class Dog extends Pet {
+	constructor(name, gender){
+		super('dog', name, gender, 'Woof!');
+	}
+}
+class Cat extends Pet {
+	constructor(name, gender){
+		super('cat', name, gender, 'Meow!');
+	}
+}
+
+class Human extends Inhabitant {
+	constructor(name, gender, says){
+		super('human', name, gender, 2, 2, says);
+	}
+}
+
+class CatHuman extends Human {
+	constructor(attachedTo, name, gender){
+		super(name, gender, attachedTo.says);
+		this.attachedTo = attachedTo;
+	}
+	get type(){
+		return 'half-cat/half-human';
+	}
+	set type(value){}
+
+	get says(){
+		return this.attachedTo.says;
+	}
+	set says(value){}
+}
+
+// ======== OBJECT DEFINITIONS ========
+const dog = new Dog('Bobik', 'male'),
+cat = new Cat('Matilda', 'female'),
+woman = new Human('Kate', 'female', 'What a beautiful day!'),
+man = new Human('Eric', 'male', 'Lets go!'),
+catWoman = new CatHuman(cat, 'Felicia', 'female');
+
 dog.friends = [cat, woman, man];
 cat.friends = [woman, catWoman];
 woman.friends = [cat, man];
