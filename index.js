@@ -15,6 +15,11 @@ class Inhabitant {
 		this.hands = hands;
 		this.says = says;
 	}
+	toString(){
+		const props = ['type', 'name', 'gender', 'legs', 'hands', 'says'].map(prop => this[prop]);
+		props.push(this.friends.map(item => item.name).join(', '));
+		return props.join('; ');
+	}
 }
 
 class Pet extends Inhabitant {
@@ -70,11 +75,5 @@ catWoman.friends = [cat];
 
 // ======== OUTPUT ========
 [dog, cat, woman, man, catWoman].forEach(entity => {
-	print(formString(entity));
+	print(entity.toString());
 });
-
-function formString(entity){
-	const props = ['type', 'name', 'gender', 'legs', 'hands', 'says'].map(prop => entity[prop]);
-	props.push(entity.friends.map(item => item.name).join(', '));
-	return props.join('; ');
-}
